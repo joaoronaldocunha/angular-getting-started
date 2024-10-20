@@ -42,7 +42,7 @@ Inicialmente o Angular vem com um componente chamado app-component que é o comp
 
   - src/app/app-component.html
   ```html
-<h1>{{title}}</h1>
+  <h1>{{title}}</h1>
   ```
 
   - src/app/app-component.scss
