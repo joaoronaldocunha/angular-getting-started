@@ -47,9 +47,9 @@ Inicialmente o Angular vem com um componente chamado app-component que é o comp
 
   - src/app/app-component.scss
   ```scss
-h1 {
-  color: blue;
-}
+  h1 {
+    color: blue;
+  }
   ```
 
 ## Passo 2: Incluir Bootstrap
