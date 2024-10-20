@@ -1,0 +1,15 @@
+<div class="jumbotron jumbotron-fluid">
+    <div class="container">
+      <img src="{{topic?.banner}}">
+      <h1 class="display-4">{{topic?.title}}</h1>
+      <p class="lead">{{topic?.description}}</p>
+    </div>
+  </div>
+  
+  <div class="text-center mb-3">
+    <iframe width="560" height="315" [src]="topic?.video | safe" 
+            title="YouTube video player" frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen></iframe>
+  </div>
+  

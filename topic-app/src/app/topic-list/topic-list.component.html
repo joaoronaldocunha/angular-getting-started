@@ -1,0 +1,12 @@
+<section class="row itemsBlock">
+
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#topic-form-modal">
+        Adicionar Novo Tópico
+    </button>
+
+    <article *ngFor="let topic of topicList" class="col-md-4 col-sm-6 col-12">
+          <app-topic-card [topic]="topic"></app-topic-card>
+    </article>
+</section>
+
+<app-topic-form></app-topic-form>

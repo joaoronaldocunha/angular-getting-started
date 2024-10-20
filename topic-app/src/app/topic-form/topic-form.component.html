@@ -1,0 +1,36 @@
+<div class="modal fade" id="topic-form-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="topic-form-title">Novo tópico</h5>
+        </div>
+        <div class="modal-body">
+            <form [formGroup]="topicForm" (submit)="submitNewTopic()">
+                <div class="form-group">
+                    <label for="topic-id">Identificador do Tópico</label>
+                    <input id="topic-id" formControlName="topicId" type="number" class="form-control" placeholder="Identificador do tópico">
+                </div>
+                <div class="form-group">
+                    <label for="topic-title">Título do Tópico</label>
+                    <input id="topic-title" formControlName="topicTitle" type="text" class="form-control" placeholder="Identificador do tópico">
+                </div>
+                <div class="form-group">
+                    <label for="topic-banner">Banner do Tópico</label>
+                    <input id="topic-banner" formControlName="topicBanner" type="url" class="form-control" placeholder="Banner do tópico">
+                </div>
+                <div class="form-group">
+                    <label for="topic-description">Descrição</label>
+                    <textarea id="topic-description" formControlName="topicDescription" class="form-control" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="topic-video">Video</label>
+                    <input id="topic-video" formControlName="topicVideo" type="url" class="form-control" placeholder="Video do Tópico">
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            <button type="button" class="btn btn-primary" (click)="submitNewTopic()">Enviar</button>
+        </div>
+    </div>
+</div>
