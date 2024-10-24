@@ -262,6 +262,18 @@ export interface Topic {
   }
   ```
 
+  - app.component.hml
+  ```html
+  <main>
+    <header class="brand-name">
+      <h1>{{title}}</h1>
+    </header>
+    <section class="content">
+      <app-topic-card [topic]="defaultTopic"></app-topic-card>
+    </section>
+  </main>
+  ```
+
   > Note que o app.component fornece agora a entrada topic que é a propriedade defautTopic.
 
 ## Passo 7: Trabalhando com Listas
