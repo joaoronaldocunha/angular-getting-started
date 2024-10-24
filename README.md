@@ -512,40 +512,44 @@ ng generate component topic-detail
   </section>
   ```
 
-- Alterar o component topic-card:
+- Alterar o component topic-detail:
   - topic-detail.component.ts
   ```typescript
   import { Component, inject } from '@angular/core';
-  import { CommonModule } from '@angular/common';
-  import { TopicCardComponent } from '../topic-card/topic-card.component';​
+  import { ActivatedRoute } from '@angular/router';
   import { Topic } from '../topic';
   import { TopicService } from '../topic.service';
-
+  
   @Component({
-    selector: 'app-topic-list',
+    selector: 'app-topic-detail',
     standalone: true,
-    imports: [CommonModule, TopicCardComponent],
-    templateUrl: './topic-list.component.html',
-    styleUrl: './topic-list.component.scss'
+    imports: [],
+    templateUrl: './topic-detail.component.html',
+    styleUrl: './topic-detail.component.scss'
   })
-  export class TopicListComponent {
+  export class TopicDetailComponent {
     topicService: TopicService = inject(TopicService);
-
-    topicList: Topic[];
-
+    route: ActivatedRoute = inject(ActivatedRoute);
+  
+    topic: Topic | undefined;
+    topicId = -1;
+      
     constructor() {
-      this.topicList = this.topicService.getAllTopics();
+      this.topicId = Number(this.route.snapshot.params['id']);
+      this.topic = this.topicService.getTopicById(this.topicId);
     }
   }
   ```
 
   - topic-detail.component.html
   ```html
-  <section class="row itemsBlock">
-    <article *ngFor="let topic of topicList" class="col-md-4 col-sm-6 col-12">
-      <app-topic-card [topic]="topic"></app-topic-card>
-    </article>
-  </section>
+  <div class="jumbotron jumbotron-fluid">
+    <div class="container">
+      <img src="{{topic?.banner}}">
+      <h1 class="display-4">{{topic?.title}}</h1>
+      <p class="lead">{{topic?.description}}</p>
+    </div>
+  </div>
   ```
 
   - topic-detail.component.scss
@@ -559,27 +563,20 @@ ng generate component topic-detail
 - Alterar o component topic-card para incluir o router para topic-detail:
   - topic-card.component.ts
   ```typescript
-  import { Component, inject } from '@angular/core';
-  import { CommonModule } from '@angular/common';
-  import { TopicCardComponent } from '../topic-card/topic-card.component';
+  import { Component, Input } from '@angular/core';
+  import { RouterModule } from '@angular/router';
   import { Topic } from '../topic';
-  import { TopicService } from '../topic.service';
-
+  
   @Component({
-    selector: 'app-topic-list',
+    selector: 'app-topic-card',
     standalone: true,
-    imports: [CommonModule, TopicCardComponent],
-    templateUrl: './topic-list.component.html',
-    styleUrl: './topic-list.component.scss'
+    imports: [RouterModule],
+    templateUrl: './topic-card.component.html',
+    styleUrl: './topic-card.component.scss'
   })
-  export class TopicListComponent {
-    topicService: TopicService = inject(TopicService);
-
-    topicList: Topic[];
-
-    constructor() {
-      this.topicList = this.topicService.getAllTopics();
-    }
+  export class TopicCardComponent {
+    // exclamação é usada para informar que é esperado um valor e não tem valor padrão definido.
+    @Input() topic!: Topic;
   }
   ```
 
