@@ -52,7 +52,7 @@ Inicialmente o Angular vem com um componente chamado app-component que é o comp
   }
   ```
 
-## Passo 2: Incluir Bootstrap
+## Passo 3: Incluir Bootstrap
 
 - Na pasta do projeto (`topic-app`), instalar o bootstrap via npm:​
 
