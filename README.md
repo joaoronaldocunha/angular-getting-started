@@ -838,7 +838,7 @@ ng generate component topic-form
   }
   ```
 
-  - topic-form.component.html
+  - topic-list.component.html
   ```html
   <section class="row itemsBlock">
 
@@ -860,9 +860,11 @@ ng generate component topic-form
 
 Agora vamos incluir o vídeo no detalhe do card. Porém para isso precisamos acreditar a URL fornecida. Vamos definir um pipe
 
-- Criar pasta shared
+Agora vamos definir um módulo para poder usar esse pipe
+
+- Criando módulo
 ```shell
-mkdir shared
+ng generate module shared
 ```
 
 - Criar arquivo safe-pipe.ts dentro da pasta shared
@@ -883,13 +885,6 @@ mkdir shared
 
   }
   ```
-
-Agora vamos definir um módulo para poder usar esse pipe
-
-- Criando módulo
-```shell
-ng generate module shared
-```
 
 - Atualizando módulo shared
   - shared.module.ts
