@@ -958,6 +958,231 @@ Agora podemos incluir esse módulo no projeto para usar o safe-pipe.
 
   ```
 
+## Passo 12: Acessando API
+
+Agora vamos ver como é feita a integração com API. Para isso vamos usar o json-server que é uma biblioteca javascript que emula um servidor que expôe um JSON em uma API.
+
+- Primeiro vamos criar uma pasta para nosso endpoint na raiz do projeto:
+
+```shell
+mkdir api
+cd api
+```
+
+- Após acessar a nova pasta `api`, inicializar o npm:
+
+```
+npm init
+```
+
+> Aqui você pode seguir com todos os valores padrão.
+
+- Agora vamos instalar nossa nova dependência, uma bilbioteca que emula um servidor que fornece conteúdo json:
+
+```shell
+npm i --save-dev json-server@0.17.4
+```
+
+> Note que estamos instalando em desenvolvimento uma versão específica do json-server.
+
+- Agora vamos criar arquivo que irá inicalizar nosso servidor:
+
+  - index.js
+  ```javascript
+  const jsonServer = require('json-server');
+  const server = jsonServer.create();
+  const router = jsonServer.router('db.json'); // Your database file
+  const middlewares = jsonServer.defaults();
+
+  // Add custom middleware for CORS
+  server.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*'); // Allow any origin
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    next();
+  });
+
+  server.use(router);
+  server.listen(3000, () => {
+    console.log('JSON Server is running');
+  });
+  ```
+
+  > Este código configura um servidor permitindo acesso CORs de qualquer origem (não recomendado em produção).
+
+  > Note que estamos referenciando o arquivo `db.json` que terá nosso conteúdo do endpoint.
+
+
+- Agora vamos criar nosso arquivo `db.json`. Aqui iremos usar o mesmo contepudo definido no service, porém no formato JSON. Para o arquivo daremos o nome de json.db. Colocar este arquivo na pasta `api`.
+
+  - db.json
+  ```json
+  {
+      "topics": [
+          {
+              "id": 123,
+              "title": "Desenvolvimento Angular",
+              "banner": "https://angular.dev/assets/images/press-kit/angular_wordmark_gradient.png",
+              "description": "Meu primeiro projeto em Angular",
+              "video": "https://www.youtube.com/embed/mVjYG9TSN88"
+          },
+          {
+              "id": 456,
+              "title": "Introdução Javascript",
+              "banner": "https://techblog.synagila.com/wp-content/uploads/sites/2/2014/07/javascript-logo-banner.jpg",
+              "description": "Programação Web com Javascript",
+              "video": "https://www.youtube.com/embed/qKJP93dWn40"
+          },
+          {
+              "id": 789,
+              "title": "Criando interfaces Web com HTML e CSS",
+              "banner": "https://media.geeksforgeeks.org/wp-content/cdn-uploads/20220630132824/HTML-Full-Form.jpg",
+              "description": "Conceitos programação HTML e CSS",
+              "video": "https://www.youtube.com/embed/mzPxo7Y6JyA"
+          }
+      ]
+  }
+  ```
+
+  > Note que pegamos essencialmente o mesmo Json que tinhamos no `topic.service.ts`, porém com algumas mudanças na estrutura.
+  
+- Feito isso, podemos iniciar um servidor que emula um backend que fornece conteúdo JSON. Para tanto, executar o seguinte comando fornecendo o arquivo json.db criado:
+
+```shell
+node index.js
+```
+
+> Como resultado é iniciado um servidor que irá servir este conteúdo JSON (por padrão na porta 3000). Por topics ser uma propriedade do JSON, ele será fornecida na rota `/topics`. E cada id será fornecido dentro dessa rota da seguinte forma: `/topic/123`, `/topic/456` e `/topic/789`
+
+> Se você estiver usando o codespace, será mapeada a porta 3000 do codespace para ser acessada via Internet.
+
+> **IMPORTANTE:** Se você estiver utilizando codespace, não esqueça de acessar a aba "PORTAS" para tornar pública a porta 300 do json-server. Faça teste de acesso direto a porta usando ferramenta de acesso a APIs (eg. Postman).
+
+- Agora está na hora de atualizar nosso TopicService para consumir esse endpoint mocked. Primeiro vamos criar uma constante `url` apontando para o endereço do nosso endpoint mocker (usar aquele que você acessou via browser).
+
+```typescript
+const url = 'http://localhost:3000/locations';
+```
+
+> Aqui estou usando localhost porque estou trabalhando na minha máquina pessoal. Porém, se estiver rodando no codespace, colocar a URL fornecida após iniciar o servidor no codespace (o mesmo está disponível na aba "PORTAS" do VS Code do codespace).
+
+- Depois vamos atualizar as funções. Começando pelo getAllTopics:
+
+``` typescript
+async getAllTopics(): Promise<Topic[]> {
+  const data = await fetch(this.url);
+  return (await data.json()) ?? [];
+}
+```
+
+> Note que a função agora é async pois ela não bloqueia quem faz a requisição, mas para retornar o resultado, esse método async devolve um promisse que permite definir uma função de callback para tratar a resposta enviada pelo servidor.
+
+> Usamos aqui o Fetch API para fazer a consulta para nosso servidor JSON.
+
+- Segue o resultado final:
+
+  - topic.service.ts:
+  
+  ```typescript
+  import { Injectable } from '@angular/core';
+  import { Topic } from './topic';
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class TopicService {
+
+    url = 'https://localhost:3000/topics';
+    
+    constructor() { }
+
+    async getAllTopics(): Promise<Topic[]> {
+      const data = await fetch(this.url);
+      return (await data.json()) ?? [];
+    }
+    async getTopicById(id: number): Promise<Topic | undefined> {
+      const data = await fetch(`${this.url}/${id}`);
+      return (await data.json()) ?? {};
+    }
+    saveTopic(newTopic: Topic): Topic {
+      console.log(JSON.stringify(newTopic));
+      fetch(this.url, { 
+        method: "post",
+        body: JSON.stringify(newTopic),
+      });
+      return newTopic;
+    }
+
+  }
+  ```
+
+- Por fim, vamos atualizar os componentes que usam o topic.service.ts para agora usar o promisse que é retornado pelas funções de consulta.
+
+  - topic-list.component.ts:
+
+  ```typescript
+  import { Component, inject } from '@angular/core';
+  import { CommonModule } from '@angular/common';
+  import { TopicCardComponent } from '../topic-card/topic-card.component';​
+  import { TopicFormComponent } from '../topic-form/topic-form.component';
+  import { Topic } from '../topic';
+  import { TopicService } from '../topic.service';
+
+  @Component({
+    selector: 'app-topic-list',
+    standalone: true,
+    imports: [CommonModule, TopicCardComponent, TopicFormComponent],
+    templateUrl: './topic-list.component.html',
+    styleUrl: './topic-list.component.scss'
+  })
+  export class TopicListComponent {
+    topicService: TopicService = inject(TopicService);
+
+    topicList: Topic[] | undefined;
+
+    constructor() {
+      this.topicService.getAllTopics().then((topicList: Topic[]) => {
+        this.topicList = topicList;
+      });
+    }
+  }
+  ```
+
+  > Note que aqui estamos obtendo o resultado do promisse para salvar na propriedade topicList.
+
+  - topic-detail.component.ts
+
+  ```typescript
+  import { Component, inject } from '@angular/core';
+  import { ActivatedRoute } from '@angular/router';
+  import { Topic } from '../topic';
+  import { TopicService } from '../topic.service';
+  import { SharedModule } from '../shared/shared.module';
+
+  @Component({
+    selector: 'app-topic-detail',
+    standalone: true,
+    imports: [SharedModule],
+    templateUrl: './topic-detail.component.html',
+    styleUrl: './topic-detail.component.scss'
+  })
+  export class TopicDetailComponent {
+    topicService: TopicService = inject(TopicService);
+    route: ActivatedRoute = inject(ActivatedRoute);
+
+    topic: Topic | undefined;
+    topicId = -1;
+      
+    constructor() {
+      this.topicId = Number(this.route.snapshot.params['id']);
+
+      this.topicService.getTopicById(this.topicId).then((topic) => {
+        this.topic = topic;
+      });
+    }
+  }
+  ```
+
 # Próximos passos
 A construção do projeto continua.
 Depois disso ainda entra a integração com o Backend, uso do localstorage, inclusao de novos componentes, entre outros.

@@ -15,9 +15,11 @@ import { TopicService } from '../topic.service';
 export class TopicListComponent {
   topicService: TopicService = inject(TopicService);
 
-  topicList: Topic[];
+  topicList: Topic[] | undefined;
 
   constructor() {
-    this.topicList = this.topicService.getAllTopics();
+    this.topicService.getAllTopics().then((topicList: Topic[]) => {
+      this.topicList = topicList;
+    });
   }
 }

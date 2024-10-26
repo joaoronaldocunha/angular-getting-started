@@ -20,6 +20,9 @@ export class TopicDetailComponent {
     
   constructor() {
     this.topicId = Number(this.route.snapshot.params['id']);
-    this.topic = this.topicService.getTopicById(this.topicId);
+
+    this.topicService.getTopicById(this.topicId).then((topic) => {
+      this.topic = topic;
+    });
   }
 }
